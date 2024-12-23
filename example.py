@@ -8,7 +8,7 @@ def x_plus_one():
     builder = Builder()
     x = builder.init()
     one = builder.constant(1)
-    x_plus_one = builder.add(x, one)
+    x_plus_one = builder.add(x, one, name="1 + 1", op_name="x + 1")
 
     builder.fill_nodes({x: 1})
     if not builder.check_constraints():
@@ -20,9 +20,9 @@ def x_plus_one():
 def x_squared_plus_five_plus_x():
     builder = Builder()
     x = builder.init()
-    x_squared = builder.mul(x, x)
-    x_squared_plus_five = builder.add(x_squared, 5)
-    y = builder.add(x_squared_plus_five, x)
+    x_squared = builder.mul(x, x, name="2^2", op_name="x^2")
+    x_squared_plus_five = builder.add(x_squared, 5, name="2^2 + 5", op_name="x^2 + 5")
+    y = builder.add(x_squared_plus_five, x, name="y", op_name="x^2 + x + 5")
 
     builder.fill_nodes({x: 2, y: 11})
     if not builder.check_constraints():
@@ -37,10 +37,10 @@ def a_plus_one_divide_by_eight():
 
     builder = Builder()
     a = builder.init()
-    b = builder.add(a, 1)
-    c = builder.hint(divide_by_eight, [b])
-    c_times_8 = builder.mul(c, 8)
-    builder.assert_equal(b, c_times_8)
+    b = builder.add(a, 1, name="2 + 1", op_name="a + 1")
+    c = builder.hint(divide_by_eight, [b], name="(2 + 1) / 8", op_name="(a + 1) / 8")
+    c_times_8 = builder.mul(c, 8, name="c * 8")
+    builder.assert_equal(b, c_times_8, name="b = c * 8")
 
     builder.fill_nodes({a: 2})
     if not builder.check_constraints():
@@ -55,10 +55,10 @@ def sqrt_computation():
 
     builder = Builder()
     x = builder.init()
-    x_plus_seven = builder.add(x, 7)
+    x_plus_seven = builder.add(x, 7, name="2 + 7")
 
-    sqrt_x_plus_7 = builder.hint(my_sqrt, [x_plus_seven])
-    computed_sq = builder.mul(sqrt_x_plus_7, sqrt_x_plus_7)
+    sqrt_x_plus_7 = builder.hint(my_sqrt, [x_plus_seven], name="sqrt(x + 7)")
+    computed_sq = builder.mul(sqrt_x_plus_7, sqrt_x_plus_7, name="sqrt(x + 7) * sqrt(x + 7)")
     builder.assert_equal(computed_sq, x_plus_seven)
 
     builder.fill_nodes({x: 2})
