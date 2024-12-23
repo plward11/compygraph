@@ -16,6 +16,7 @@ def x_plus_one():
 
     plot = builder.plot(filename="x_plus_one.png")
 
+
 def x_squared_plus_five_plus_x():
     builder = Builder()
     x = builder.init()
@@ -28,6 +29,7 @@ def x_squared_plus_five_plus_x():
         print("Example x_squared_plus_five_plus_x is failing!")
 
     plot = builder.plot(filename="x_squared_plus_five_plus_x.png")
+
 
 def a_plus_one_divide_by_eight():
     def divide_by_eight(a):
@@ -45,6 +47,7 @@ def a_plus_one_divide_by_eight():
         print("Example a_plus_one_divide_by_eight is failing!")
 
     plot = builder.plot(filename="a_plus_one_divide_by_eight.png")
+
 
 def sqrt_computation():
     def my_sqrt(a):
@@ -64,9 +67,10 @@ def sqrt_computation():
 
     plot = builder.plot(filename="sqrt_computation.png")
 
+
 def x_pow_y_plus_z_plus_seven():
     def my_pow_plus(a, b, c):
-        return a ** b + c
+        return a**b + c
 
     builder = Builder()
     x = builder.init(name="x")
@@ -83,7 +87,8 @@ def x_pow_y_plus_z_plus_seven():
 
     plot = builder.plot(filename="x_pow_y_plus_z_plus_seven.png")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     x_plus_one()
     x_squared_plus_five_plus_x()
     a_plus_one_divide_by_eight()

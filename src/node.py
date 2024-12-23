@@ -24,6 +24,7 @@ class Node:
         Gets the human-readable name of the node if possible, otherwise returns the
         ID of the node.
     """
+
     def __init__(self, id: str, name: str | None = None) -> None:
         self.id = id
         self.name = name

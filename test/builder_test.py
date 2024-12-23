@@ -5,6 +5,7 @@ import io
 import math
 import unittest
 
+
 class TestBuilder(unittest.TestCase):
 
     def test_empty_graph(self):
@@ -12,7 +13,10 @@ class TestBuilder(unittest.TestCase):
         f = io.StringIO()
         with contextlib.redirect_stderr(f):
             self.assertFalse(builder.check_constraints())
-            self.assertEqual("No operations in graph. Cannot run graph without any operations defined.", f.getvalue().rstrip())
+            self.assertEqual(
+                "No operations in graph. Cannot run graph without any operations defined.",
+                f.getvalue().rstrip(),
+            )
             self.assertIsNone(builder.get_graph_results())
 
             plot = builder.plot()
@@ -28,7 +32,10 @@ class TestBuilder(unittest.TestCase):
         f = io.StringIO()
         with contextlib.redirect_stderr(f):
             self.assertFalse(builder.check_constraints())
-            self.assertEqual("No operations in graph. Cannot run graph without any operations defined.", f.getvalue().rstrip())
+            self.assertEqual(
+                "No operations in graph. Cannot run graph without any operations defined.",
+                f.getvalue().rstrip(),
+            )
             self.assertIsNone(builder.get_graph_results())
 
             plot = builder.plot()
@@ -46,7 +53,10 @@ class TestBuilder(unittest.TestCase):
         f = io.StringIO()
         with contextlib.redirect_stderr(f):
             self.assertFalse(builder.check_constraints())
-            self.assertEqual("Node x is undefined. Must define node in order to check constraints.", f.getvalue().rstrip())
+            self.assertEqual(
+                "Node x is undefined. Must define node in order to check constraints.",
+                f.getvalue().rstrip(),
+            )
 
     def test_failed_constraint(self):
         builder = Builder()
@@ -58,7 +68,10 @@ class TestBuilder(unittest.TestCase):
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             self.assertFalse(builder.check_constraints())
-            self.assertEqual("Node x + 1 = 3 has an expected value of 3, but this does not match the calculated value of 2", f.getvalue().rstrip())
+            self.assertEqual(
+                "Node x + 1 = 3 has an expected value of 3, but this does not match the calculated value of 2",
+                f.getvalue().rstrip(),
+            )
 
     def test_failed_assertion(self):
         builder = Builder()
@@ -71,7 +84,10 @@ class TestBuilder(unittest.TestCase):
         f = io.StringIO()
         with contextlib.redirect_stdout(f):
             self.assertFalse(builder.check_constraints())
-            self.assertEqual("Node assert 1 + 1 = 3 has failed assertion that node x + 1 and node 3 are equal.", f.getvalue().rstrip())
+            self.assertEqual(
+                "Node assert 1 + 1 = 3 has failed assertion that node x + 1 and node 3 are equal.",
+                f.getvalue().rstrip(),
+            )
 
     def test_filling_value_on_node_not_in_graph(self):
         builder_a = Builder()
@@ -84,9 +100,10 @@ class TestBuilder(unittest.TestCase):
 
         f = io.StringIO()
         with contextlib.redirect_stderr(f):
-            self.assertFalse(builder_a.fill_nodes({x: 1, y:2}))
-            self.assertEqual("Node y isn't in graph. Cannot set its value.", f.getvalue().rstrip())
-
+            self.assertFalse(builder_a.fill_nodes({x: 1, y: 2}))
+            self.assertEqual(
+                "Node y isn't in graph. Cannot set its value.", f.getvalue().rstrip()
+            )
 
     def test_error_when_mixing_nodes_between_different_graphs(self):
         builder_a = Builder()
@@ -100,7 +117,10 @@ class TestBuilder(unittest.TestCase):
         with self.assertRaises(InvalidNodeArgument) as error:
             x_plus_two = builder_b.add(x, two, op_name="x + 2")
 
-        self.assertEqual("Node x isn't in graph. Unable to add the x + 2 operation.", str(error.exception))
+        self.assertEqual(
+            "Node x isn't in graph. Unable to add the x + 2 operation.",
+            str(error.exception),
+        )
 
     def test_unsupported_file_extension_exception(self):
         builder = Builder()
@@ -112,7 +132,9 @@ class TestBuilder(unittest.TestCase):
         with self.assertRaises(UnsupportedPlotFileExtension) as error:
             builder.plot(filename="my_chart.foo")
 
-        self.assertEqual("Unknown file format for saving graph: .foo", str(error.exception))
+        self.assertEqual(
+            "Unknown file format for saving graph: .foo", str(error.exception)
+        )
 
     def test_simple_graph(self):
         builder = Builder()
@@ -191,7 +213,7 @@ class TestBuilder(unittest.TestCase):
 
     def test_node_with_hint_with_multiple_input_nodes(self):
         def my_pow_plus(a, b, c):
-            return a ** b + c
+            return a**b + c
 
         builder = Builder()
         x = builder.init(name="x")
@@ -214,7 +236,7 @@ class TestBuilder(unittest.TestCase):
 
     def test_node_with_floats(self):
         def my_pow(a, b):
-            return a ** b
+            return a**b
 
         builder = Builder()
         x = builder.init(name="x")
@@ -235,5 +257,5 @@ class TestBuilder(unittest.TestCase):
         self.assertEqual(len(plot.get_edges()), 12)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

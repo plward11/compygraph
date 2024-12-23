@@ -22,6 +22,7 @@ class InvalidNodeArgument(Exception):
     Currently used to represent attempts to add operations on nodes that aren't
     defined in the current graph.
     """
+
     def __init__(self, message):
         super().__init__(message)
 
@@ -30,6 +31,7 @@ class UnsupportedPlotFileExtension(Exception):
     """
     Used for attempts to create a plot file with an unsupported file extension.
     """
+
     def __init__(self, message):
         super().__init__(message)
 
@@ -41,7 +43,7 @@ class UnsupportedPlotFileExtension(Exception):
 class Builder:
     """
     A wrapper around graphkit for computational graphs.
-     
+
     This class abstracts away tracking nodes and handling operations with relationships
     defined between nodes in a computational graph. Provides convenience functions for
     basic operations like addition and multiplcation. Also allows for assertions on equality
@@ -99,6 +101,7 @@ class Builder:
         Runs the graph and renders the graph to the filename, if given
 
     """
+
     current_id: int
     current_operation_id: int
     operations: list[Operation]
@@ -120,11 +123,15 @@ class Builder:
         # Checks equality of two numbers. The default tolerance is 1e-09 - https://docs.python.org/3/library/math.html#math.isclose.
         return math.isclose(a, b)
 
-    def __check_operation__(self, nodes: Sequence[int | float | Node], op_name: str) -> None:
+    def __check_operation__(
+        self, nodes: Sequence[int | float | Node], op_name: str
+    ) -> None:
         # Validates that the given nodes for an operation are in the graph.
         for node in nodes:
             if type(node) is Node and node not in self.nodes:
-                raise InvalidNodeArgument(f"Node {node.get_name()} isn't in graph. Unable to add the {op_name} operation.")
+                raise InvalidNodeArgument(
+                    f"Node {node.get_name()} isn't in graph. Unable to add the {op_name} operation."
+                )
 
     def __add_node__(self, name: str | None = None) -> Node:
         # Adds a node to the current graph.
@@ -134,7 +141,9 @@ class Builder:
         self.nodes.add(node)
         return node
 
-    def __maybe_add_constant_nodes__(self, nodes: Sequence[int | float | Node]) -> Sequence[Node]:
+    def __maybe_add_constant_nodes__(
+        self, nodes: Sequence[int | float | Node]
+    ) -> Sequence[Node]:
         # Converts any int or constant values in the list of nodes to Constant nodes.
         nodes_with_constants = []
 
@@ -147,16 +156,21 @@ class Builder:
 
         return nodes_with_constants
 
-    def __add_operation__(self, operands: Sequence[int | float | Node], result_node: Node, fn: Callable, op_id: str, op_name: str | None = None) -> None:
+    def __add_operation__(
+        self,
+        operands: Sequence[int | float | Node],
+        result_node: Node,
+        fn: Callable,
+        op_id: str,
+        op_name: str | None = None,
+    ) -> None:
         # Adds an operation to the current graph.
         op_name = op_name if op_name else op_id
         nodes = self.__maybe_add_constant_nodes__(operands)
         node_ids = [node.id for node in nodes]
 
-        self.operations.append(operation(
-            name=op_id,
-            needs=node_ids,
-            provides=[result_node.id])(fn)
+        self.operations.append(
+            operation(name=op_id, needs=node_ids, provides=[result_node.id])(fn)
         )
         self.current_operation_id += 1
 
@@ -166,23 +180,31 @@ class Builder:
     def __get_graph__(self) -> compose | None:
         # Validates the graph. If valid, returns the graph composition. Otherwise, returns None.
         if len(self.operations) == 0:
-            print(f"No operations in graph. Cannot run graph without any operations defined.", file=sys.stderr)
+            print(
+                f"No operations in graph. Cannot run graph without any operations defined.",
+                file=sys.stderr,
+            )
             return None
 
         for node_id, val in self.inputs.items():
             if val == None:
-                print(f"Node {self.node_id_to_label[node_id]} is undefined. Must define node in order to check constraints.", file=sys.stderr)
+                print(
+                    f"Node {self.node_id_to_label[node_id]} is undefined. Must define node in order to check constraints.",
+                    file=sys.stderr,
+                )
                 return None
 
         return compose(name="graph")(*self.operations)
 
-    def __run_graph__(self, graph_composer: compose | None = None) -> dict[str, int | float | bool] | None:
+    def __run_graph__(
+        self, graph_composer: compose | None = None
+    ) -> dict[str, int | float | bool] | None:
         # Runs the graph and returns the output. May return None if the graph isn't valid.
         graph = graph_composer
 
         if graph == None:
             graph = self.__get_graph__()
-        
+
         return None if graph == None else graph(self.inputs)
 
     def __check_constraints__(self, graph_composer: compose | None = None) -> bool:
@@ -193,17 +215,29 @@ class Builder:
             return False
 
         satisfied_constraints = True
-        
+
         for node_id, val in self.inputs.items():
             if val != computation_result[node_id]:
-                print(f"Node {self.node_id_to_label[node_id]} has an expected value of {val}, but this does not match the calculated value of {computation_result[node_id]}")
+                print(
+                    f"Node {self.node_id_to_label[node_id]} has an expected value of {val}, but this does not match the calculated value of {computation_result[node_id]}"
+                )
                 satisfied_constraints = False
 
         for node_id, operands in self.assertion_node_id_to_nodes.items():
             if not computation_result[node_id]:
-                a_label = operands[0].get_name() if type(operands[0]) is Node else str(operands[0])
-                b_label = operands[1].get_name() if type(operands[1]) is Node else str(operands[1])
-                print(f"Node {self.node_id_to_label[node_id]} has failed assertion that node {a_label} and node {b_label} are equal.")
+                a_label = (
+                    operands[0].get_name()
+                    if type(operands[0]) is Node
+                    else str(operands[0])
+                )
+                b_label = (
+                    operands[1].get_name()
+                    if type(operands[1]) is Node
+                    else str(operands[1])
+                )
+                print(
+                    f"Node {self.node_id_to_label[node_id]} has failed assertion that node {a_label} and node {b_label} are equal."
+                )
                 satisfied_constraints = False
 
         return satisfied_constraints
@@ -244,7 +278,13 @@ class Builder:
         self.inputs[constant.id] = value
         return constant
 
-    def add(self, a: int | float | Node, b: int | float | Node, name: str | None = None, op_name: str | None = None) -> Node:
+    def add(
+        self,
+        a: int | float | Node,
+        b: int | float | Node,
+        name: str | None = None,
+        op_name: str | None = None,
+    ) -> Node:
         """Returns a new node in the graph for the addition operation
 
         Defines an addition operation on the given two nodes or constants. If the given
@@ -278,7 +318,13 @@ class Builder:
         self.__add_operation__(operands, result_node, add, op_id, op_name)
         return result_node
 
-    def mul(self, a: int | float | Node, b: int | float | Node, name: str | None = None, op_name: str | None = None) -> Node:
+    def mul(
+        self,
+        a: int | float | Node,
+        b: int | float | Node,
+        name: str | None = None,
+        op_name: str | None = None,
+    ) -> Node:
         """Returns a new node in the graph for the multiplication operation
 
         Defines a multiplication operation on the given two nodes or constants. If the given
@@ -312,7 +358,13 @@ class Builder:
         self.__add_operation__(operands, result_node, mul, op_id, op_name)
         return result_node
 
-    def assert_equal(self, a: int | float | Node, b: int | float | Node, name: str | None = None, op_name: str | None = None):
+    def assert_equal(
+        self,
+        a: int | float | Node,
+        b: int | float | Node,
+        name: str | None = None,
+        op_name: str | None = None,
+    ):
         """Returns a new node in the graph for asserting equality
 
         Defines an equality operation on the given two nodes or constants. If the given
@@ -346,7 +398,13 @@ class Builder:
         op_id = "equal" + str(self.current_operation_id)
         self.__add_operation__(operands, result_node, self.__equal__, op_id, op_name)
 
-    def hint(self, fn: Callable, nodes: Sequence[int | float | Node], name: str | None = None, op_name: str | None = None) -> Node:
+    def hint(
+        self,
+        fn: Callable,
+        nodes: Sequence[int | float | Node],
+        name: str | None = None,
+        op_name: str | None = None,
+    ) -> Node:
         """Returns a new node in the graph for the result of running the given function
 
         Defines an operation representing calling the given function on the given list of
@@ -396,9 +454,14 @@ class Builder:
         """
         for node, val in inputs.items():
             if node not in self.nodes:
-                print(f"Node {node.get_name()} isn't in graph. Cannot set its value.", file=sys.stderr)
+                print(
+                    f"Node {node.get_name()} isn't in graph. Cannot set its value.",
+                    file=sys.stderr,
+                )
             self.inputs[node.id] = val
-            self.node_id_to_label[node.id] = self.node_id_to_label[node.id] + " = " + str(val)
+            self.node_id_to_label[node.id] = (
+                self.node_id_to_label[node.id] + " = " + str(val)
+            )
 
     def check_constraints(self) -> bool:
         """Checks all assertions and any value expectations in the input map
@@ -495,7 +558,9 @@ class Builder:
 
             ext_lowered = ext.lower()
             if ext_lowered not in ext_to_img_create_fn:
-                raise UnsupportedPlotFileExtension(f"Unknown file format for saving graph: {ext}")
+                raise UnsupportedPlotFileExtension(
+                    f"Unknown file format for saving graph: {ext}"
+                )
 
             with open(filename, "wb") as f:
                 f.write(ext_to_img_create_fn[ext_lowered]())
