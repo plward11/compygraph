@@ -6,7 +6,7 @@ import math
 
 def x_plus_one():
     builder = Builder()
-    x = builder.init()
+    x = builder.init(name="x")
     one = builder.constant(1)
     x_plus_one = builder.add(x, one, name="1 + 1", op_name="x + 1")
 
@@ -19,7 +19,7 @@ def x_plus_one():
 
 def x_squared_plus_five_plus_x():
     builder = Builder()
-    x = builder.init()
+    x = builder.init(name="x")
     x_squared = builder.mul(x, x, name="2^2", op_name="x^2")
     x_squared_plus_five = builder.add(x_squared, 5, name="2^2 + 5", op_name="x^2 + 5")
     y = builder.add(x_squared_plus_five, x, name="y", op_name="x^2 + x + 5")
@@ -36,7 +36,7 @@ def a_plus_one_divide_by_eight():
         return a / 8
 
     builder = Builder()
-    a = builder.init()
+    a = builder.init(name="a")
     b = builder.add(a, 1, name="2 + 1", op_name="a + 1")
     c = builder.hint(divide_by_eight, [b], name="(2 + 1) / 8", op_name="(a + 1) / 8")
     c_times_8 = builder.mul(c, 8, name="c * 8")
@@ -54,7 +54,7 @@ def sqrt_computation():
         return math.sqrt(a)
 
     builder = Builder()
-    x = builder.init()
+    x = builder.init(name="x")
     x_plus_seven = builder.add(x, 7, name="2 + 7")
 
     sqrt_x_plus_7 = builder.hint(my_sqrt, [x_plus_seven], name="sqrt(x + 7)")
